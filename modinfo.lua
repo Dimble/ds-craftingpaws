@@ -1,5 +1,7 @@
 name = "Crafting Paws"
-description = "Pause while crafting or placing items.  (Mostly based on Relaxed Crafting)"
+description = "Pause while crafting or placing items.\n"..
+              "(based on Relaxed Crafting by noobler and Crafting Pause by hmaarrfk)"
+
 author = "Dimblemace"
 forumthread = ""
 

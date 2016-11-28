@@ -18,17 +18,20 @@ mod.AddClassPostConstruct("widgets/crafttabs",
 --      tostring((crafttabs.crafting.open and paws.crafting)) .. " " ..
 --      tostring((crafttabs.controllercraftingopen and paws.controllercrafting)))
 
+        local pcon = GetPlayer().components.playercontroller
+        if ( not paws.placement_handler and
+             ((pcon.placer and pcon.placer_recipe) or
+              (pcon.deployplacer and pcon.deployplacer.components.placer)) ) then
+            paws.placement_handler = TheInput:AddMoveHandler(paws.UpdatePlacer)
+        end
+
         if ( not paws.active and
              ((crafttabs.crafting.open and paws.crafting) or
               (crafttabs.controllercraftingopen and paws.controllercrafting)) ) then
---print("paws.active (crafttabs)")
             paws.active = true
         end
 
         if ( paws.active and not IsPaused() ) then
---print("crafttabs OnUpdate: not paused, paws.active, bufferedaction:"
---      ..tostring(not not player.components.locomotor.bufferedaction)
---      .." idle:"..tostring(player.components.playercontroller.inst.sg:HasStateTag("idle")))
             if not player.components.locomotor.bufferedaction and
                player.components.playercontroller.inst.sg:HasStateTag("idle") then
                 SetPause(true, "Paws mod")
@@ -45,7 +48,8 @@ mod.AddClassPostConstruct("widgets/crafting",
     local baseClose = crafting.Close
     function crafting:Close(fn)
         baseClose(crafting, fn)
-        if ( not (paws.placement and player.components.playercontroller.placer) ) then
+        if ( not GetWorld().minimap.MiniMap:IsVisible() and
+             not (paws.placement and player.components.playercontroller.placer) ) then
             SetPause(false);
             paws.active = false;
         end

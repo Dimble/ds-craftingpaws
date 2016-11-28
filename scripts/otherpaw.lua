@@ -6,7 +6,7 @@
 -- TODO controller commands
 
 -- make sure the image of the placed item follows the pointer while paused
-function UpdatePlacer()
+function paws.UpdatePlacer()
     if not IsPaused() then return end
     local pcompcon = GetPlayer().components.playercontroller
     if not pcompcon then return end
@@ -59,17 +59,26 @@ return function(mod)
             end
         end
 
+    local base_CancelPlacement = pcomp.playercontroller.CancelPlacement
+    pcomp.playercontroller.CancelPlacement =
+        function(pcon)
+            base_CancelPlacement(pcon)
+            if ( paws.active ) then
+                SetPause(false)
+                paws.active = false
+            end
+        end
+
     local base_OnUpdate = pcomp.playercontroller.OnUpdate
     pcomp.playercontroller.OnUpdate =
         function(pcon, dt)
             base_OnUpdate(pcon, dt)
---            base_OnUpdate(pcomp.playercontroller, dt)
             if ( not paws.placement ) then return end
 
             if ( not paws.placement_handler and
                  ((pcon.placer and pcon.placer_recipe) or
                   (pcon.deployplacer and pcon.deployplacer.components.placer)) ) then
-                paws.placement_handler = TheInput:AddMoveHandler(UpdatePlacer)
+                paws.placement_handler = TheInput:AddMoveHandler(paws.UpdatePlacer)
             end
 
             if ( IsPaused() ) then
@@ -124,7 +133,7 @@ return function(mod)
                     (control == CONTROL_ROTATE_LEFT and  -45 or 45))
                 TheCamera:Snap()
                 if ( paws.placement_handler ) then
-                    UpdatePlacer()  -- not a big deal, but looks funny until moved
+                    paws.UpdatePlacer()  -- not a big deal, but looks funny until moved
                 end
             elseif ( (pcon.placer and pcon.placer_recipe) or
                      (pcon.deployplacer and pcon.deployplacer.components.placer) ) then
@@ -145,18 +154,6 @@ return function(mod)
  end)
 end
 
---[[
-This doesn't seem to be the only way that placements can be cancelled, so we can't rely on it
-    local base_CancelPlacement = pcomp.playercontroller.CancelPlacement
-    pcomp.playercontroller.CancelPlacement =
-        function(pcon)
-            if ( paws.active ) then
-                SetPause(false)
-                paws.active = false
-            end
-            base_CancelPlacement(pcon)
-        end
---]]
 --[[
 --print("paws.active:"..tostring(paws.active)
 --      .." control:"..tostring(control)..
