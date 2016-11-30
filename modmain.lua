@@ -1,6 +1,6 @@
 -- debugging stuffz, don't load a game you care about with these enabled
-GLOBAL.CHEATS_ENABLED = true
-GLOBAL.require("debugkeys")
+-- GLOBAL.CHEATS_ENABLED = true
+-- GLOBAL.require("debugkeys")
 
 --[[
 Much inspiration came from:

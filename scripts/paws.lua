@@ -178,7 +178,7 @@ env.AddSimPostInit(function(player)
                     (control == CONTROL_ROTATE_LEFT and  -45 or 45))
                 TheCamera:Snap()
                 if ( paws.placement_handler ) then
-                    paws.UpdatePlacer()
+                    UpdatePlacer()
                 end
               -- graphically you can zoom in/out while crafting, but the zoom controls are used by the crafting bars
             elseif ( paws.placing ) then
