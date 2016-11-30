@@ -1,11 +1,16 @@
 set "DEST=C:\Steam\SteamApps\common\dont_starve\mods"
 @echo off
 
-echo rmdir /S /Q "$DEST\oldcraftingpaws"
-rmdir /S /Q "%DEST%\oldcraftingpaws"
+rem echo rmdir /S /Q "$DEST\oldcraftingpaws"
+rem rmdir /S /Q "%DEST%\oldcraftingpaws"
 
-echo move "$DEST\craftingpaws" "$DEST\oldcraftingpaws"
-move "%DEST%\craftingpaws" "%DEST%\oldcraftingpaws"
+rem echo move "$DEST\craftingpaws" "$DEST\oldcraftingpaws"
+rem move "%DEST%\craftingpaws" "%DEST%\oldcraftingpaws"
+
+if not exist "%DEST%" goto NODIR
+
+echo rmdir /S /Q "$DEST\craftingpaws"
+rmdir /S /Q "%DEST%\craftingpaws"
 
 echo mkdir "$DEST\craftingpaws"
 mkdir "%DEST%\craftingpaws"
@@ -20,8 +25,12 @@ FOR %%G IN (modicon.tex, modicon.xml, modinfo.lua, modmain.lua) DO copy %%G "%DE
 echo copy (controlicon.tex, controlicon.xml, mouseicon1.tex, mouseicon1.xml, placeicon.tex, placeicon.xml, smallpaw.tex, smallpaw.xml)
 FOR %%G IN (controlicon.tex, controlicon.xml, mouseicon1.tex, mouseicon1.xml, placeicon.tex, placeicon.xml, smallpaw.tex, smallpaw.xml) DO copy images\%%G "%DEST%\craftingpaws\images"
 
-echo copy (bar.lua, craft.lua, otherpaw.lua, screen.lua)
-FOR %%G IN (bar.lua, craft.lua, otherpaw.lua, screen.lua) DO copy scripts\%%G "%DEST%\craftingpaws\scripts"
+echo copy (bar.lua, paws.lua, screen.lua)
+FOR %%G IN (bar.lua, paws.lua, screen.lua) DO copy scripts\%%G "%DEST%\craftingpaws\scripts"
 
 echo Don't Crash!
+exit /b 0
 
+:NODIR
+echo %DEST% does not seem to exist.  Ask Maxwell where it went.
+exit /b 1

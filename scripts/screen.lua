@@ -60,6 +60,7 @@ function paws.Screen:OnControl(control, down)
 end
 
 -- FIXME  positioning was haphazardly done by trial and error
+-- FIXME cancel probably doesn't work right
 function paws.Screen:Setup()
     self.proot = self:AddChild(Widget("Screen root"))
     self.proot:SetVAnchor(ANCHOR_MIDDLE)
@@ -82,24 +83,24 @@ function paws.Screen:Setup()
 
     self.mouse_text = self.grid:AddItem(Text(BUTTONFONT, 30, paws.STRING_MOUSE), 1, 1)
     self.mouse_spinner = self.grid:AddItem(Spinner(EnabledDisabled, 160), 1, 2)
-    self.mouse_spinner:SetSelected(paws.crafting)
+    self.mouse_spinner:SetSelected(paws.setting.mousecraft)
     self.mouse_spinner:SetTextColour(0,0,0,1)  -- default seems to be white
-    self.mouse_spinner:SetTooltip(paws.STRING_MOUSE_TOOLTIP)
-    function self.mouse_spinner:OnChanged(data) paws.SetCrafting(data) end
+    self.mouse_spinner:SetTooltip(paws.STRING_HELP_MOUSE)
+    function self.mouse_spinner:OnChanged(data) paws.setting.mousecraft = data end
 
     self.controller_text = self.grid:AddItem(Text(BUTTONFONT, 30, paws.STRING_CONTROLLER), 2, 1)
     self.controller_spinner = self.grid:AddItem(Spinner(EnabledDisabled, 160), 2, 2)
-    self.controller_spinner:SetSelected(paws.controllercrafting)
+    self.controller_spinner:SetSelected(paws.setting.controllercraft)
     self.controller_spinner:SetTextColour(0,0,0,1)
-    self.controller_spinner:SetTooltip(paws.STRING_CONTROLLER_TOOLTIP)
-    function self.controller_spinner:OnChanged(data) paws.SetControllerCrafting(data) end
+    self.controller_spinner:SetTooltip(paws.STRING_HELP_CONTROLLER)
+    function self.controller_spinner:OnChanged(data) paws.setting.controllercraft = data end
 
     self.placement_text = self.grid:AddItem(Text(BUTTONFONT, 30, paws.STRING_PLACEMENT), 3, 1)
     self.placement_spinner = self.grid:AddItem(Spinner(EnabledDisabled, 160), 3, 2)
-    self.placement_spinner:SetSelected(paws.placement)
+    self.placement_spinner:SetSelected(paws.setting.placement)
     self.placement_spinner:SetTextColour(0,0,0,1)
-    self.placement_spinner:SetTooltip(paws.STRING_PLACEMENT_TOOLTIP)
-    function self.placement_spinner:OnChanged(data) paws.SetPlacement(data) end
+    self.placement_spinner:SetTooltip(paws.STRING_HELP_PLACEMENT)
+    function self.placement_spinner:OnChanged(data) paws.setting.placement = data end
 
     self.close_button = self.grid:AddItem(ImageButton(), 4, 2)
 --    self.close_button:SetColour( default should be fine

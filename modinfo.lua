@@ -5,7 +5,7 @@ description = "Pause while crafting or placing items.\n"..
 author = "Dimblemace"
 forumthread = ""
 
-version = "0.8"
+version = "0.82"
 api_version = 6
 --priority = ?
 
@@ -20,24 +20,26 @@ shipwrecked_compatible = true
 configuration_options =
 {
     {
-        name = "controllercrafting",
+        name = "controllercraft",
         label = "Controller crafting",
         options =
         {
             { description = "paused", data = true },
             { description = "not paused", data = false },
+            { description = "unset", data = nil },
         },
-        default = true,
+        default = nil,
     },
     {
-        name = "crafting",
+        name = "mousecraft",
         label = "Mouse crafting",
         options =
         {
             { description = "paused", data = true },
             { description = "not paused", data = false },
+            { description = "unset", data = nil },
         },
-        default = true,
+        default = nil,
     },
     {
         name = "placement",
@@ -46,8 +48,9 @@ configuration_options =
         {
             { description = "paused", data = true },
             { description = "not paused", data = false },
+            { description = "unset", data = nil },
         },
-        default = false,
+        default = nil,
     },
     {
         name = "collapse delay",

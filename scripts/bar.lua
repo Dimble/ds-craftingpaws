@@ -2,34 +2,20 @@ local Widget = require "widgets/widget"
 local Image = require "widgets/image"
 local ImageButton = require "widgets/imagebutton"
 
--- TODO controller access
-
-local icon_width, icon_height
-local icon_scale
-
-function Initialize()
--- the default icon size of 68 and scale of .6 are to match slots from inventorybar.lua
--- TODO obtain the size & scale from actual inventory slots
-    icon_width, icon_height = paws.icon_width or 68, paws.icon_height or 68
-    icon_scale = (paws.icon_scale or 6) / 10
-    icon_width, icon_height = icon_width * icon_scale, icon_height * icon_scale
---print("init width, height: "..icon_width..", "..icon_height)
-
-    -- Defaults for saveable values (someday...)
-    if not paws.bar_position_x then paws.bar_position_x = -(1.5*icon_width) end
-    -- (70 is the y position of MapControls)
-    if not paws.bar_position_y then paws.bar_position_y = 70 + (1.5*icon_height) end
-    if not paws.bar_orientation then paws.bar_orientation = 2 end
-end
-
---------------------------------------------------------------------------------
-
 local PawsBar = Class(Widget,
  function(self)
     Widget._ctor(self, "Paws Bar")
 
-    self:SetPosition(paws.bar_position_x, paws.bar_position_y)
-    self.orientation = paws.bar_orientation
+    -- Defaults
+    local bar_x = -(1.5 * paws.setting.icon_width)
+    local bar_y = 70 + (1.5 * paws.setting.icon_height) -- (70 is the y position of MapControls)
+    self.orientation = 2
+
+    if ( paws.setting.bar_x ) then bar_x = paws.setting.bar_x end
+    if ( paws.setting.bar_y ) then bar_y = paws.setting.bar_y end
+    if ( paws.setting.bar_orientation ) then self.orientation = paws.setting.bar_orientation end
+
+    self:SetPosition(bar_x, bar_y)
  end)
 
 function PawsBar:Expand()
@@ -66,14 +52,14 @@ function PawsBar:Recalculating()
     add = (self.orientation == 1 or self.orientation == 3) and  1 or -1
     -- (setting ImageBG here rather than repeating the conditionals)
     if ( index == 1 ) then
-        add = icon_width * add
+        add = paws.setting.icon_width * add
         pos[index] = (self.orientation == 1) and  self.border or -self.border
-        self.ImageBG:SetScale((4*icon_width + 2*self.border) / bg_w, icon_height / bg_h, 1)
+        self.ImageBG:SetScale((4*paws.setting.icon_width + 2*self.border) / bg_w, paws.setting.icon_height / bg_h, 1)
         self.ImageBG:SetPosition(add + add/2, 0)
     else -- index == 2
-        add = icon_height * add
+        add = paws.setting.icon_height * add
         pos[index] = (self.orientation == 3) and  self.border or -self.border
-        self.ImageBG:SetScale(icon_width / bg_w, (4*icon_height + 2*self.border) / bg_h, 1)
+        self.ImageBG:SetScale(paws.setting.icon_width / bg_w, (4*paws.setting.icon_height + 2*self.border) / bg_h, 1)
         self.ImageBG:SetPosition(0, add + add/2)
     end
 
@@ -104,7 +90,7 @@ end
 
 -- Convert screen position to a (hopefully) bottom-right scaled position.  ..Does the game not have this function?
 -- TODO generalize for the parent root widget
-function SetLocalPositionBR(widget, x, y)
+local function SetLocalPositionBR(widget, x, y)
     if type(x) == "table" then
         x, y = x.x, x.y
     end
@@ -140,9 +126,9 @@ local PawsButton = Class(ImageButton,
     ImageButton._ctor(self, atlas, normal, focus, disabled)
     self.name = "Paws Button"
 
-    --self.image:ScaleToSize(icon_width, icon_height);
+    --self.image:ScaleToSize(paws.setting.icon_width, paws.setting.icon_height);
     local w, h = self:GetSize()
-    self:SetScale(icon_width / w * icon_scale, icon_height / h * icon_scale, 1)
+    self:SetScale(paws.setting.icon_width / w * paws.setting.icon_scale, paws.setting.icon_height / h * paws.setting.icon_scale, 1)
  end)
 
 function PawsButton:CheckTint(enabled)
@@ -201,10 +187,9 @@ end
 
 --------------------------------------------------------------------------------
 
-return function(mod)
-    mod.AddSimPostInit(
-    function(player)
-        Initialize()
+return function(env)
+    env.AddSimPostInit(function(player)
+--        Initialize()
         paws.bar = player.HUD.controls.bottomright_root:AddChild(PawsBar())
 
     --- Main icon button
@@ -214,25 +199,25 @@ return function(mod)
     --- Crafting toggle
         paws.bar.BtnCrafting = paws.bar:AddChild(PawsButton("images/mouseicon1.xml", "mouseicon1.tex"))
         paws.bar.BtnCrafting.CheckSetting =
-            function() paws.bar.BtnCrafting:CheckTint(paws.crafting) end
+            function() paws.bar.BtnCrafting:CheckTint(paws.setting.mousecraft) end
         paws.bar.BtnCrafting:SetOnClick(
-            function() paws.SetCrafting(not paws.crafting)
+            function() paws.setting.mousecraft = not paws.setting.mousecraft
                        paws.bar.BtnCrafting:CheckSetting() end)
 
     --- Controller crafting toggle
         paws.bar.BtnControllerCrafting = paws.bar:AddChild(PawsButton("images/controlicon.xml", "controlicon.tex"))
         paws.bar.BtnControllerCrafting.CheckSetting =
-            function() paws.bar.BtnControllerCrafting:CheckTint(paws.controllercrafting) end
+            function() paws.bar.BtnControllerCrafting:CheckTint(paws.setting.controllercraft) end
         paws.bar.BtnControllerCrafting:SetOnClick(
-            function() paws.SetControllerCrafting(not paws.controllercrafting)
+            function() paws.setting.controllercraft = not paws.setting.controllercraft
                        paws.bar.BtnControllerCrafting:CheckSetting() end)
 
     --- Placement toggle
         paws.bar.BtnPlacement = paws.bar:AddChild(PawsButton("images/placeicon.xml", "placeicon.tex"))
         paws.bar.BtnPlacement.CheckSetting =
-            function() paws.bar.BtnPlacement:CheckTint(paws.placement) end
+            function() paws.bar.BtnPlacement:CheckTint(paws.setting.placement) end
         paws.bar.BtnPlacement:SetOnClick(
-            function() paws.SetPlacement(not paws.placement)
+            function() paws.setting.placement = not paws.setting.placement
                        paws.bar.BtnPlacement:CheckSetting() end)
 
     --- Background image of bar
@@ -245,6 +230,6 @@ return function(mod)
 
         paws.bar:CheckSettings()
         paws.bar:Recalculating()
-    end)
+    end)  -- AddSimPostInit
 end
 
